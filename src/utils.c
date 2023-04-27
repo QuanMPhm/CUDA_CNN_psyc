@@ -19,7 +19,6 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <math.h>
-#include <time.h>
 #include "psyc.h"
 #include "utils.h"
 

@@ -723,15 +723,16 @@ void convolve(double * input, double * output, double * kernel, double bias, int
             ki = 0; kj = 0;
 
             // Convolve
-            for (ii = i; ii < kernel_size; ii++) {
-                for (jj = j; jj < kernel_size; jj++) {
+            for (ii = i; ii < i + kernel_size; ii++) {
+                kj = 0;
+                for (jj = j; jj < j + kernel_size; jj++) {
                     sum += kernel[ki * kernel_size + kj] * input[ii * in_size + jj];
                     kj++;
                 }
                 ki++;
             }
 
-            output[i * out_size + j] = sum;
+            output[i * out_size + j] = sum + bias;
         }
     }
 
