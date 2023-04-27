@@ -421,6 +421,9 @@ int PSConvolve(void * _net, void * _layer, ...) {
         prev_features_step = feature_count / prev_features; // How many feature maps will be the output
     }
 
+    /* Timers */
+    struct timespec start, stop, start_alloc, stop_alloc, start_test, stop_test;
+
     /* Init some arrays for functions which expect linear memory */
     double * input_a;
     double * output_a;
@@ -429,9 +432,13 @@ int PSConvolve(void * _net, void * _layer, ...) {
     double bias_t;
 
     /* Allocate test arrays */
+    clock_gettime(CLOCK_REALTIME, &start_alloc);
     input_a = malloc(sizeof(double) * input_w * input_w);
     output_a = malloc(sizeof(double) * feature_size);
     output_real = malloc(sizeof(double) * feature_size);
+    clock_gettime(CLOCK_REALTIME, &stop_alloc);
+
+    printf("%f\n", interval(start_alloc, stop_alloc));
 
 
     // This is where we optimize
@@ -453,9 +460,12 @@ int PSConvolve(void * _net, void * _layer, ...) {
         bias_t = bias;
 
         /* Test */
+        clock_gettime(CLOCK_REALTIME, &start_test);
         convolve(input_a, output_a, kernel_a, bias_t, stride, input_w, output_w, region_size);
+        clock_gettime(CLOCK_REALTIME, &stop_test);
 
         // Original code
+        clock_gettime(CLOCK_REALTIME, &start);
         for (j = 0; j < feature_size; j++) {
             int idx = (i * feature_size) + j;
             PSNeuron * neuron = layer->neurons[idx];    // Get neuron, this is an array of structs, huge strides!!!
@@ -511,7 +521,10 @@ int PSConvolve(void * _net, void * _layer, ...) {
                 }
             }
         }
-    
+        clock_gettime(CLOCK_REALTIME, &stop);
+
+        printf("%f, %f\n", interval(start_test, stop_test), interval(start, stop));
+
         // Compare the two matrixes
         compare_mat(output_a, output_real, feature_size / output_w, feature_size / output_w);
 
