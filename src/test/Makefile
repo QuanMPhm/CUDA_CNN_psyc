@@ -1,15 +1,12 @@
 SHELL=/bin/bash
 CC=gcc
-CFLAGS=-std=c11 -g -ggdb
+CFLAGS=-std=gnu11 -g -ggdb
 LDFLAGS=-lz -lm
 OBJS=../psyc.o ../utils.o ../convolutional.o ../recurrent.o ../lstm.o ../mnist.o
 
 include ../avx.mk
 
-ifeq ($(AVX),on)
-	CFLAGS=-DUSE_AVX -mavx2 -mfma -std=c99 -g -ggdb
-        OBJS+=../avx.o
-endif
+
 
 default: all
 
