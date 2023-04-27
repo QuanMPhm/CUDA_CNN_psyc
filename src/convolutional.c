@@ -454,14 +454,15 @@ int PSConvolve(void * _net, void * _layer, ...) {
         row = 0;
         col = 0;
 
+        clock_gettime(CLOCK_REALTIME, &start_test);
         /* Assign args for test functions */
         for (j = 0; j < input_w * input_w; j++) input_a[j] = previous->neurons[j]->activation;
         kernel_a = weights;
         bias_t = bias;
 
         /* Test */
-        clock_gettime(CLOCK_REALTIME, &start_test);
         convolve(input_a, output_a, kernel_a, bias_t, stride, input_w, output_w, region_size);
+        for (j = 0; j < feature_size; j++) layer->neurons[j + i * feature_size]->z_value = output_a[j];
         clock_gettime(CLOCK_REALTIME, &stop_test);
 
         // Original code
