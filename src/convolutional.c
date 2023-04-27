@@ -31,6 +31,12 @@
 #include "convolutional.h"
 #include "recurrent.h"
 
+
+/* Generic convolution functions, assume square matrixs */
+void convolve(double * input, double * output, double * kernel, double bias, int stride);
+void convolve_test(double * input, double * output, double * kernel, double bias, int stride);
+
+
 double getDeltaForConvolutionalNeuron(PSNeuron * neuron,
                                       PSLayer * layer,
                                       PSLayer * nextLayer,
@@ -415,12 +421,25 @@ int PSConvolve(void * _net, void * _layer, ...) {
         prev_features_step = feature_count / prev_features; // How many feature maps will be the output
     }
 
+    /* Init some arrays for functions which expect linear memory */
+    double * input_a;
+    double * output_a;
+    double * output_real;
+    double * kernel_a;
+    double bias_t;
+
+    /* Allocate test arrays */
+    input_a = malloc(sizeof(double) * input_w * input_w);
+    output_a = malloc(sizeof(double) * feature_size);
+    output_real = malloc(sizeof(double) * feature_size);
+
+
     // This is where we optimize
     /* For each feature ... */
     for (i = 0; i < feature_count; i++) {
         double bias = shared->biases[i];
         double * weights = shared->weights[i];
-        int previous_feature = 0, feature_offset = 0;   // Which previous feature are we convolving from, and offset into activation array
+        int previous_feature = 0, feature_offset = 0;   // Index of which previous feature are we convolving from, and offset into activation array
         if (prev_features > 1) {    // Special case...
             previous_feature = i / prev_features_step;
             feature_offset = previous_feature * previous_feature_size;
@@ -428,10 +447,18 @@ int PSConvolve(void * _net, void * _layer, ...) {
         row = 0;
         col = 0;
 
-        // For each node in output feature map
+        /* Assign args for test functions */
+        for (j = 0; j < input_w * input_w; j++) input_a[j] = previous->neurons[j]->activation;
+        kernel_a = weights;
+        bias_t = bias;
+
+        /* Test */
+        convolve(input_a, output_a, kernel_a, bias_t, stride);
+
+        // Original code
         for (j = 0; j < feature_size; j++) {
             int idx = (i * feature_size) + j;
-            PSNeuron * neuron = layer->neurons[idx];    // Get neuron
+            PSNeuron * neuron = layer->neurons[idx];    // Get neuron, this is an array of structs, huge strides!!!
             col = idx % (int) output_w;
             if (col == 0 && j > 0) row++;   // That's a funny way to go to next row
             int r_row = row * stride;       // ??
@@ -460,15 +487,18 @@ int PSConvolve(void * _net, void * _layer, ...) {
                 }
 #endif
                 for (; x < max_x; x++) {
-                    int nidx = feature_offset + (y * input_w) + x;
+                    int nidx = feature_offset + (y * input_w) + x;  // Navigating grid
                     //printf("  -> %d,%d [%d]\n", x, y, nidx);
                     PSNeuron * prev_neuron = previous->neurons[nidx];
                     double a = prev_neuron->activation;
-                    sum += (a * weights[widx++]);
+                    sum += (a * weights[widx++]);   // Weights array linear
                 }
             }
             neuron->z_value = sum + bias;
             neuron->activation = layer->activate(neuron->z_value);
+
+            // Sum for the test
+            output_real[j] = sum + bias;
 #ifdef USE_AVX
             if (!is_recurrent)
                 layer->avx_activation_cache[idx] = neuron->activation;
@@ -481,7 +511,19 @@ int PSConvolve(void * _net, void * _layer, ...) {
                 }
             }
         }
+    
+        // Compare the two matrixes
+        compare_mat(output_a, output_real, feature_size / output_w, feature_size / output_w);
+
     }
+
+    /* Free test arrays */
+    free(input_a);
+    free(output_a);
+    free(output_real);
+
+    exit(0);
+
     return 1;
 }
 

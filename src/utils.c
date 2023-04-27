@@ -106,3 +106,40 @@ double gaussian_random(double mean, double stddev) {
     double r = normalized_random();
     return (r > 0.5 ? y : x);
 }
+
+void compare_mat(double * A, double * B, int r_len, int c_len) {
+    double avg_err;
+    double largest_err = 0;
+    double total_err = 0;
+
+    for (int i = 0; i < c_len; i++) {
+        for (int j = 0; j < r_len; j++) {
+            double err = abs(A[i * r_len + j] - B[i * r_len + j]);
+            total_err += err;
+            if (err > largest_err) largest_err = err;
+        }
+    }
+
+    avg_err = total_err / (r_len * c_len);
+
+    if (total_err == 0) printf("No error!\n");
+    else {
+        printf("Errors founded!\n");
+        printf("Average err per element is: %f\n", avg_err);
+        printf("Largest err between 2 elements was: %f\n", largest_err);
+        printf("Total err is: %f\n", total_err);
+    }
+}
+
+/* --- Interval code --- */
+double interval(struct timespec start, struct timespec end)
+{
+  struct timespec temp;
+  temp.tv_sec = end.tv_sec - start.tv_sec;
+  temp.tv_nsec = end.tv_nsec - start.tv_nsec;
+  if (temp.tv_nsec < 0) {
+    temp.tv_sec = temp.tv_sec - 1;
+    temp.tv_nsec = temp.tv_nsec + 1000000000;
+  }
+  return (((double)temp.tv_sec) + ((double)temp.tv_nsec)*1.0e-9);
+}

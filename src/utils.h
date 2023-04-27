@@ -19,6 +19,7 @@
 #define __PS_UTILS_H
 
 #include <math.h>
+#include <time.h>
 
 #ifndef M_PI
 #define M_PI 3.141592653589793
@@ -151,5 +152,9 @@ void PSAbortLayer(PSNeuralNetwork * network, PSLayer * layer);
 double normalized_random();
 
 double gaussian_random(double mean, double stddev);
+
+void compare_mat(float * A, float * B, int r_len, int c_len);
+
+double interval(struct timespec start, struct timespec end);
 
 #endif //__PS_UTILS_H

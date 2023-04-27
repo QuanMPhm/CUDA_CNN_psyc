@@ -20,6 +20,7 @@
 #include <string.h>
 #include "../psyc.h"
 #include "../mnist.h"
+#include "../utils.h"
 
 #define INPUT_SIZE (28 * 28)
 #define EPOCHS 30
