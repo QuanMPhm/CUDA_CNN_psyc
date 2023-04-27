@@ -153,7 +153,7 @@ double normalized_random();
 
 double gaussian_random(double mean, double stddev);
 
-void compare_mat(float * A, float * B, int r_len, int c_len);
+void compare_mat(double * A, double * B, int r_len, int c_len);
 
 double interval(struct timespec start, struct timespec end);
 

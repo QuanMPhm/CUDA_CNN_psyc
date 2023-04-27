@@ -33,8 +33,8 @@
 
 
 /* Generic convolution functions, assume square matrixs */
-void convolve(double * input, double * output, double * kernel, double bias, int stride);
-void convolve_test(double * input, double * output, double * kernel, double bias, int stride);
+void convolve(double * input, double * output, double * kernel, double bias, int stride, int in_size, int out_size, int kernel_size);
+void convolve_test(double * input, double * output, double * kernel, double bias, int stride, int size);
 
 
 double getDeltaForConvolutionalNeuron(PSNeuron * neuron,
@@ -453,7 +453,7 @@ int PSConvolve(void * _net, void * _layer, ...) {
         bias_t = bias;
 
         /* Test */
-        convolve(input_a, output_a, kernel_a, bias_t, stride);
+        convolve(input_a, output_a, kernel_a, bias_t, stride, input_w, output_w, region_size);
 
         // Original code
         for (j = 0; j < feature_size; j++) {
@@ -711,4 +711,28 @@ int PSConvolutionalBackprop(PSLayer* convolutional_layer, PSLayer * prev_layer,
         }
     }
     return 1;
+}
+
+void convolve(double * input, double * output, double * kernel, double bias, int stride,  int in_size, int out_size, int kernel_size) {
+    int i, j, ii, jj, ki, kj;
+    double sum;
+    // For each output entry:
+    for (i = 0; i < out_size; i++) {
+        for (j = 0; j < out_size; j++) {
+            sum = 0;
+            ki = 0; kj = 0;
+
+            // Convolve
+            for (ii = i; ii < kernel_size; ii++) {
+                for (jj = j; jj < kernel_size; jj++) {
+                    sum += kernel[ki * kernel_size + kj] * input[ii * in_size + jj];
+                    kj++;
+                }
+                ki++;
+            }
+
+            output[i * out_size + j] = sum;
+        }
+    }
+
 }
