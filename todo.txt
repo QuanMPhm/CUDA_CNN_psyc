@@ -1,0 +1,12 @@
+Metrics:
+    - Time for each sample to forward and backward
+    - Time for each element in sample to computed (for convo, for fully connected)
+    - Tiem for each epoch
+
+Create synthetic data generator
+
+Create basic CUDA code for convolution, measure CPU baseline
+
+- Baseline of original code:
+    - Get the time for each batch, or each sample, and each element, to forward and backward
+        - Vary by data size, stride?, kernel size
