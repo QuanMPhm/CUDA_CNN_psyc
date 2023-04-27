@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 CC=gcc
-CFLAGS=-std=c99 -g -ggdb
+CFLAGS=-std=c11 -g -ggdb
 LDFLAGS=-lz -lm
 OBJS=../psyc.o ../utils.o ../convolutional.o ../recurrent.o ../lstm.o ../mnist.o
 
@@ -24,5 +24,8 @@ lstm_demo: $(OBJS) lstm_demo.o
 char_rnn: $(OBJS) char_rnn.o
 	$(CC) -o ../../bin/char_rnn $(OBJS) char_rnn.o $(LDFLAGS)
 all: mnist_demo conv_demo rnn_demo lstm_demo char_rnn
-	
+
+clear_tests:
+	rm -f $(OBJS)
+	rm -f ./*.o
         
