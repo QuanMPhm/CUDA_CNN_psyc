@@ -1,3 +1,7 @@
+/*
+    nvcc cuda_convolve.cu -o ./bin/cuda_convolve
+*/
+
 #include <cstdio>
 #include <cstdlib>
 #include <math.h>
@@ -30,6 +34,10 @@ double interval(struct timespec start, struct timespec end)
 
 /* --- CUDA functions --- */
 
+__global__ void kernel_conv(double * input, double * output, double * kernel, double bias, int stride, int in_size, int out_size, int kernel_size) {
+    // First idea is to...
+    // Each 
+};
 
 /* --- End CUDA functions --- */
 

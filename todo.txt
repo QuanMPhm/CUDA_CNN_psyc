@@ -1,3 +1,5 @@
+We want our functions to work on image sizes from 28x28 (MNiST) to 2048x2048
+
 Metrics:
     - Time for each sample to forward and backward
     - Time for each element in sample to computed (for convo, for fully connected)
