@@ -1,0 +1,7 @@
+Done with Conv on GPU
+Errors founded!
+Average absolute err per element is: 0.000000
+Largest absolute err between 2 elements was: 0.000000
+Total err is: 0.00000000000012190249
+Time measurements (s): GPU (w/ transfers, CPU
+0.000113, 0.000055, 

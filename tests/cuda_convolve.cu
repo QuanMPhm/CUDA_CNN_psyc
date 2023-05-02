@@ -17,6 +17,7 @@
 #define C       28
 #define OPTIONS 20
 
+
 #define k_s 5
 
 void convolve(double * input, double * output, double * kernel, double bias, int stride, int in_size, int out_size, int kernel_size);

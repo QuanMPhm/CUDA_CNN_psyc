@@ -1,0 +1,38 @@
+No error!
+No error!
+No error!
+No error!
+No error!
+No error!
+No error!
+No error!
+No error!
+No error!
+No error!
+No error!
+No error!
+Errors founded for size 1064!
+Average absolute err per element is: 1.550468
+Largest absolute err between 2 elements was: 8.861180
+Total err is: 1755278.57607
+Errors founded for size 1144!
+Average absolute err per element is: 1.474931
+Largest absolute err between 2 elements was: 8.321926
+Total err is: 1930294.64712
+Time measurements (s): Matrix Size, GPU (w/ transfers, CPU
+28, 0.000105, 0.000055
+108, 0.000144, 0.001032
+188, 0.000357, 0.003267
+268, 0.000701, 0.007041
+348, 0.001190, 0.011348
+428, 0.001586, 0.017259
+508, 0.002265, 0.024318
+588, 0.002998, 0.030740
+668, 0.003802, 0.039751
+748, 0.004739, 0.051968
+828, 0.005632, 0.061424
+908, 0.006717, 0.073900
+988, 0.007910, 0.087321
+1068, 0.007850, 0.102291
+1148, 0.009034, 0.118488
+
