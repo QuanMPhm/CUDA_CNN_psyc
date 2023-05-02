@@ -12,10 +12,11 @@
 
 #define STRIDE 1
 
-#define A       8
+#define A       0
 #define B       16
 #define C       28
-#define OPTIONS 15
+#define OPTIONS 20
+
 
 #define k_s 5
 
@@ -61,6 +62,8 @@ __global__ void kernel_conv(double * input, double * output, double * kernel,
     output[r * out_size + c] = sum + bias;
 };
 
+
+
 /* --- End CUDA functions --- */
 
 int main(int argc, char **argv) {
@@ -80,10 +83,16 @@ int main(int argc, char **argv) {
     First idea:
         Assign each block a row
         Get as many blocks as there are rows
+
+    Second idea: Apply local memory
+
+    Third idea: Local memory + unrolling
+
+    Fourth idea: Better memory coalescense
     */
     for (int i = 0; i < OPTIONS; i++) {
         int in_s, out_s;
-        in_s = A * A * i + B * i + C;
+        in_s = A * i * i + B * i + C;
         out_s = in_s - k_s + 1;
         mat_sizes[i] = in_s;
         int block_n = out_s;
