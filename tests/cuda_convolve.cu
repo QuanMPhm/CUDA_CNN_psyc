@@ -70,13 +70,14 @@ __global__ void kernel_shared_conv(double * input, double * output, double * ker
     // Read kernel into shared memory
     // Each thread read in kernel_size number of inputs into shared memory
     // To decide whcih thread reads in kernel, just use index
-    // We have about 96KB of memory = 12K doubles
+    // We have about 96KB of memory = 12K doublesc
 
     // Each output depends on kernel_size * kernel_size inputs
     // A row of output depends on kernel_size * in_size inputs
 
-    __shared__ double kernel_s[kernel_size][kernel_size];
-    __shared__ double input_s[kernel_size][in_size];
+    extern __shared__ double s[];
+    double * kernel_s = s;
+    double * input_s = &kernel_s[kernel_size * kernel_size];
 
     int c = threadIdx.x;
     int r = blockIdx.x; 
@@ -86,24 +87,24 @@ __global__ void kernel_shared_conv(double * input, double * output, double * ker
     int tot_kernel_size = kernel_size * kernel_size;
     // Simple case, each thread read one kernel element
     if (tot_kernel_size <= in_size) {
-        if (c < tot_kernel_size) kernel_s[c / kernel_s][c % kernel_s] = kernel[c];
+        if (c < tot_kernel_size) kernel_s[c] = kernel[c];
     } else {    // Stupid case, 
         float lim = ceil((float) tot_kernel_size / in_size);
         for (i = 0; i < lim; i++) {
             int k_i = c + (i * in_size);
-            if (k_i < tot_kernel_size) kernel_s[k_i / kernel_s][k_i % kernel_s] = kernel[k_i];
+            if (k_i < tot_kernel_size) kernel_s[k_i] = kernel[k_i];
         }
     }
 
     // Read kernel_size inputs
-    for (i = r; i < r + kernel_size; i++) input_s[i][c] = input[i * in_size + c];
+    for (i = r; i < r + kernel_size; i++) input_s[i * in_size + c] = input[i * in_size + c];
 
     // Each thread less within boudns do convo
     if (c < out_size) {
         for (i = r; i < r + kernel_size; i++) {
             kj = 0;
             for (j = c; j < c + kernel_size; j++) {
-                sum += kernel_s[ki][kj] * input_s[i][j];
+                sum += kernel_s[ki * kernel_size + kj] * input_s[i * in_size + j];
                 kj++;
             }
             ki++;
@@ -175,7 +176,7 @@ int main(int argc, char **argv) {
         cudaMemcpy(ker_d, ker_h, ker_alloc_size, cudaMemcpyHostToDevice);
 
         // Run kernel
-        kernel_shared_conv<<<griddim, blockdim>>>(in_d, out_d, ker_d, bias, STRIDE, in_s, out_s, k_s);
+        kernel_shared_conv<<<griddim, blockdim, (k_s * k_s + k_s * in_s) * sizeof(double)>>>(in_d, out_d, ker_d, bias, STRIDE, in_s, out_s, k_s);
         // Copy back
         cudaMemcpy(out_h, out_d, out_alloc_size, cudaMemcpyDeviceToHost);
         // printf("Done with Conv on GPU\n");
