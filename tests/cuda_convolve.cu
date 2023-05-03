@@ -105,6 +105,7 @@ __global__ void kernel_shared_conv(double * input, double * output, double * ker
     for (i = 0; i < kernel_size; i++) input_s[i * in_size + c] = input[(i+r) * in_size + c];
     __syncthreads();
 
+
     // Each thread less within boudns do convo
     if (c < out_size) {
         for (i = 0; i < kernel_size; i++) {
@@ -331,6 +332,7 @@ int main(int argc, char **argv) {
                 // Compare accuracy
                 compare_mat(out_CPU, out_h, out_s, out_s);
             }
+
 
             // --- Shared cov kernel ---
             {
